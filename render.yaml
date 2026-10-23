@@ -1,0 +1,37 @@
+services:
+  # Backend Docker Web Service
+  - type: web
+    name: squid-protocol-backend
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: starter
+    region: oregon
+    healthCheckPath: /health/live
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: squid-protocol-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: FRONTEND_URL
+        sync: false # Set to your deployed Vercel URL
+      - key: ALLOWED_ORIGINS
+        sync: false # Comma-separated list including your Vercel URL
+
+databases:
+  # Render Managed PostgreSQL Database
+  - name: squid-protocol-db
+    plan: starter
+    region: oregon
+    databaseName: squid_protocol
+    user: squid_user

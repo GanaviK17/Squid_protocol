@@ -1,0 +1,45 @@
+services:
+  squid-postgres:
+    image: postgres:16-alpine
+    container_name: squid-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: squid_user
+      POSTGRES_PASSWORD: squid_secret
+      POSTGRES_DB: squid_protocol
+    ports:
+      - "5433:5432"
+    volumes:
+      - squid_pgdata:/var/lib/postgresql/data
+      - ./backend/docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U squid_user -d squid_protocol"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  squid-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: squid-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://squid_user:squid_secret@squid-postgres:5432/squid_protocol?schema=public
+      TEST_DATABASE_URL: postgresql://squid_user:squid_secret@squid-postgres:5432/squid_protocol_test?schema=public
+      TEST_RESET_ENABLED: "false"
+      SESSION_SECRET: production-grade-session-secret-change-before-deployment
+      JWT_SECRET: production-grade-jwt-secret-change-before-deployment
+      COOKIE_SECURE: "false"
+      FRONTEND_URL: http://localhost:5173
+      ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
+    ports:
+      - "5000:5000"
+    depends_on:
+      squid-postgres:
+        condition: service_healthy
+
+volumes:
+  squid_pgdata:

@@ -1,0 +1,70 @@
+name: Safe Test Database Cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_reset:
+        description: "Type 'RESET-TEST-DATABASE' to execute cleanup"
+        required: true
+        type: string
+      dry_run:
+        description: "Execute in dry-run mode (verify connectivity only)"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: test-db-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup-test-database:
+    name: Execute Safe Test Database Reset
+    runs-on: ubuntu-latest
+    if: github.repository == github.event.repository.full_name # Guard: Never run on PRs or forks
+
+    steps:
+      - name: Validate Manual Input Confirmation
+        if: ${{ inputs.confirm_reset != 'RESET-TEST-DATABASE' && !inputs.dry_run }}
+        run: |
+          echo "❌ Critical Safety Abort: Confirmation text did not match 'RESET-TEST-DATABASE'."
+          exit 1
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Monorepo Dependencies
+        run: npm ci
+
+      - name: Dry-Run Verification Probe
+        if: ${{ inputs.dry_run }}
+        env:
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+        run: |
+          echo "🔍 Dry-run: Verifying that TEST_DATABASE_URL is defined and target database contains 'test'..."
+          if [[ -z "$TEST_DATABASE_URL" ]]; then
+            echo "❌ TEST_DATABASE_URL secret is not defined in GitHub repository secrets."
+            exit 1
+          fi
+          if [[ "$TEST_DATABASE_URL" != *"test"* ]]; then
+            echo "❌ CRITICAL SAFETY ABORT: Target database URL does not contain 'test' in its connection string."
+            exit 1
+          fi
+          echo "✅ Target verified as safe dedicated TEST database."
+
+      - name: Execute Safe Test Reset
+        if: ${{ !inputs.dry_run }}
+        env:
+          NODE_ENV: test
+          TEST_RESET_ENABLED: "true"
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+        run: |
+          echo "🛡️ Executing safe reset against dedicated test database..."
+          npm run db:reset:test --workspace=backend
+          echo "✅ Test database cleanup completed successfully."
