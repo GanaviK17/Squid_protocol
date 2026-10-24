@@ -4,7 +4,7 @@ import { SymbolMap } from '../../components/GeometricShapes';
 import { apiRequest } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useSound } from '../../context/SoundContext';
-import { CheckCircle2, RotateCcw, HelpCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, RotateCcw, ShieldCheck } from 'lucide-react';
 
 interface ShapeSudokuProps {
   data: SudokuData;
@@ -153,7 +153,7 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
     setErrorMessage(null);
 
     try {
-      const res = await apiRequest('/round2/sudoku/submit', {
+      await apiRequest('/round2/sudoku/submit', {
         method: 'POST',
         body: JSON.stringify({
           submittedGrid: grid.join(''),
@@ -187,7 +187,7 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
 
         {data.isCompleted ? (
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00e676]/20 border border-[#00e676]/40 text-[#00e676] font-mono text-xs font-bold">
-            <ShieldCheck className="w-4 h-4" />
+            <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             <span>SOLVED & VERIFIED (+100 PTS)</span>
           </div>
         ) : (
@@ -197,16 +197,17 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
                 type="checkbox"
                 checked={useHint}
                 onChange={(e) => setUseHint(e.target.checked)}
-                className="w-3.5 h-3.5 rounded bg-black border-gray-700 text-[#00f0ff] focus:ring-0"
+                className="w-3.5 h-3.5 rounded bg-black border-gray-700 text-[#00f0ff] focus:ring-0 cursor-pointer"
               />
               <span>Use Hint (-25% pts)</span>
             </label>
             <button
               onClick={handleResetToInitial}
+              aria-label="Reset puzzle to starting state"
               title="Reset to puzzle starting state"
-              className="flex items-center gap-1.5 px-3 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono text-xs transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 cursor-pointer"
             >
-              <RotateCcw className="w-3 h-3" />
+              <RotateCcw className="w-3 h-3" aria-hidden="true" />
               <span>Reset</span>
             </button>
           </div>
@@ -221,7 +222,11 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* The 6x6 Sudoku Grid */}
         <div className="lg:col-span-8 flex justify-center">
-          <div className="grid grid-cols-6 gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-2xl bg-[#090b0f] border-2 border-gray-700 shadow-2xl">
+          <div
+            role="grid"
+            aria-label="6 by 6 Shape Sudoku Grid"
+            className="grid grid-cols-6 gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-2xl bg-[#090b0f] border-2 border-gray-700 shadow-2xl"
+          >
             {grid.map((cellVal, idx) => {
               const isFixed = fixedCells[idx];
               const isSelected = selectedCell === idx;
@@ -235,16 +240,26 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
               const isBottomBlockEdge = r === 1 || r === 3;
               const isRightBlockEdge = c === 2;
 
+              const cellLabel = `Cell Row ${r + 1}, Column ${c + 1}: ${
+                symbolObj ? symbolObj.label : 'Empty'
+              }${isFixed ? ', fixed starting clue' : ''}${
+                hasConflict ? ', conflict detected' : ''
+              }${isSelected ? ', selected' : ''}`;
+
               return (
                 <button
                   key={idx}
+                  type="button"
+                  role="gridcell"
+                  aria-label={cellLabel}
+                  aria-selected={isSelected}
                   disabled={data.isCompleted}
                   onClick={() => setSelectedCell(idx)}
-                  className={`w-11 h-11 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center transition-all ${
+                  className={`w-11 h-11 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b0f] ${
                     isSelected
                       ? 'ring-2 ring-[#00f0ff] bg-[#00f0ff]/15 shadow-[0_0_15px_rgba(0,240,255,0.4)]'
                       : hasConflict
-                      ? 'bg-red-950/40 border border-red-500/70 animate-pulse'
+                      ? 'bg-red-950/40 border border-red-500/70 animate-pulse motion-reduce:animate-none'
                       : isFixed
                       ? 'bg-[#181c26] border border-gray-700/60 opacity-90'
                       : 'bg-[#12151c] border border-gray-800/80 hover:border-gray-600 hover:bg-[#1a202c]'
@@ -265,11 +280,11 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
         {/* Symbol Palette & Actions */}
         <div className="lg:col-span-4 space-y-6">
           <div className="p-5 rounded-2xl bg-[#090b0f] border border-gray-800 space-y-4">
-            <h4 className="font-mono text-xs text-gray-400 uppercase tracking-wider">
+            <h4 className="font-mono text-xs text-gray-400 uppercase tracking-wider font-semibold">
               Symbol Selector
             </h4>
 
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-2.5" role="group" aria-label="Available geometric symbols">
               {SYMBOL_KEYS.map((symKey) => {
                 const sObj = SymbolMap[symKey];
                 const Icon = sObj.component;
@@ -277,12 +292,14 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
                 return (
                   <button
                     key={symKey}
+                    type="button"
+                    aria-label={`Insert ${sObj.label} symbol into selected cell`}
                     disabled={data.isCompleted || selectedCell === null || fixedCells[selectedCell]}
                     onClick={() => handleSetSymbol(symKey)}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-[#12151c] border border-gray-800 hover:border-[#ff004f]/60 hover:bg-[#181c26] transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-[#12151c] border border-gray-800 hover:border-[#ff004f]/60 hover:bg-[#181c26] transition-all disabled:opacity-40 disabled:cursor-not-allowed group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b0f]"
                   >
                     <Icon size={26} color={sObj.color} />
-                    <span className="font-mono text-[10px] text-gray-400 group-hover:text-white uppercase">
+                    <span className="font-mono text-[10px] text-gray-400 group-hover:text-white uppercase font-bold">
                       {sObj.label}
                     </span>
                   </button>
@@ -292,18 +309,20 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
 
             <div className="pt-2">
               <button
+                type="button"
+                aria-label="Clear contents of selected cell"
                 disabled={data.isCompleted || selectedCell === null || fixedCells[selectedCell]}
                 onClick={handleClearCell}
-                className="w-full py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono text-xs transition-colors disabled:opacity-40"
+                className="w-full py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono text-xs transition-colors disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 cursor-pointer"
               >
-                Clear Cell (Del)
+                Clear Cell (Del / Backspace)
               </button>
             </div>
           </div>
 
           {/* Submission Feedback */}
           {errorMessage && (
-            <div className="p-4 rounded-xl bg-red-950/30 border border-red-800 text-red-400 text-xs font-mono">
+            <div role="alert" className="p-4 rounded-xl bg-red-950/30 border border-red-800 text-red-400 text-xs font-mono">
               {errorMessage}
             </div>
           )}
@@ -311,21 +330,22 @@ export const ShapeSudoku: React.FC<ShapeSudokuProps> = ({ data, onSuccess }) => 
           {/* Submit Grid */}
           {!data.isCompleted && (
             <button
+              type="button"
               disabled={!isFilled || isSubmitting}
               onClick={handleSubmit}
-              className={`w-full py-3.5 rounded-xl font-display font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all ${
+              className={`w-full py-3.5 rounded-xl font-display font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
                 !isFilled
                   ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
                   : isSubmitting
                   ? 'bg-gray-700 text-gray-300'
-                  : 'bg-[#ff004f] text-white hover:bg-[#ff2e7e] shadow-[0_0_20px_rgba(255,0,79,0.4)] cursor-pointer'
+                  : 'bg-[#ff004f] text-white hover:bg-[#ff2e7e] shadow-[0_0_20px_rgba(255,0,79,0.4)] cursor-pointer focus-visible:ring-[#ff004f]'
               }`}
             >
               {isSubmitting ? (
                 'CHECKING WITH CENTRAL DAEMON...'
               ) : (
                 <>
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
                   <span>TRANSMIT SUDOKU SOLUTION</span>
                 </>
               )}

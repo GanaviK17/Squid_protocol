@@ -54,7 +54,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
   if (isUpcoming) {
     return (
       <div className="bg-[#12151c] rounded-2xl border border-gray-800 p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-6">
-        <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-800/40 text-cyan-400 flex items-center justify-center mx-auto">
+        <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-800/40 text-cyan-400 flex items-center justify-center mx-auto" aria-hidden="true">
           <Lock className="w-8 h-8" />
         </div>
         <div className="space-y-2">
@@ -69,7 +69,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
           Tournament officials have not activated Round 1 yet. When the round begins, your team will receive 10 questions delivered sequentially. Watch the Red Light / Green Light signal carefully!
         </p>
         <div className="p-4 rounded-xl bg-black/40 border border-gray-800/80 inline-flex items-center gap-3 font-mono text-xs text-gray-400">
-          <Clock className="w-4 h-4 text-cyan-400" />
+          <Clock className="w-4 h-4 text-cyan-400" aria-hidden="true" />
           <span>Scheduled Round Duration: 15 Minutes</span>
         </div>
       </div>
@@ -80,7 +80,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
   if (isCompleted) {
     return (
       <div className="bg-[#12151c] rounded-2xl border border-gray-800 p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-6">
-        <div className="w-16 h-16 rounded-full bg-[#00e676]/20 border border-[#00e676]/40 text-[#00e676] flex items-center justify-center mx-auto">
+        <div className="w-16 h-16 rounded-full bg-[#00e676]/20 border border-[#00e676]/40 text-[#00e676] flex items-center justify-center mx-auto" aria-hidden="true">
           <CheckCircle2 className="w-8 h-8" />
         </div>
         <div className="space-y-2">
@@ -96,7 +96,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
         </p>
         <button
           onClick={onRefresh}
-          className="px-6 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-mono text-xs uppercase tracking-wider transition-colors"
+          className="px-6 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-mono text-xs uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] cursor-pointer"
         >
           Refresh Status
         </button>
@@ -108,7 +108,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
   if (isEnded && !currentQuestion) {
     return (
       <div className="bg-[#12151c] rounded-2xl border border-gray-800 p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-6">
-        <div className="w-16 h-16 rounded-full bg-red-950/40 border border-red-800/40 text-red-400 flex items-center justify-center mx-auto">
+        <div className="w-16 h-16 rounded-full bg-red-950/40 border border-red-800/40 text-red-400 flex items-center justify-center mx-auto" aria-hidden="true">
           <Clock className="w-8 h-8" />
         </div>
         <div className="space-y-2">
@@ -208,8 +208,12 @@ export const Round1View: React.FC<Round1ViewProps> = ({
 
       {/* Admin Pause Banner */}
       {isPaused && (
-        <div className="bg-amber-950/40 border border-amber-500/50 rounded-xl p-4 flex items-center gap-3 text-amber-300 font-mono text-sm">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-400 animate-pulse" />
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="bg-amber-950/40 border border-amber-500/50 rounded-xl p-4 flex items-center gap-3 text-amber-300 font-mono text-sm"
+        >
+          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-400 animate-pulse motion-reduce:animate-none" aria-hidden="true" />
           <div>
             <span className="font-bold uppercase tracking-wider">ROUND 1 CURRENTLY PAUSED: </span>
             <span>Timer is frozen by tournament officials. Submissions are temporarily suspended.</span>
@@ -219,9 +223,13 @@ export const Round1View: React.FC<Round1ViewProps> = ({
 
       {/* Admin Double Points Banner */}
       {isDoublePoints && (
-        <div className="bg-[#ff004f]/10 border border-[#ff004f]/40 rounded-xl p-3 flex items-center justify-between text-white font-mono text-xs">
+        <div
+          role="status"
+          aria-label="Double points modifier active"
+          className="bg-[#ff004f]/10 border border-[#ff004f]/40 rounded-xl p-3 flex items-center justify-between text-white font-mono text-xs"
+        >
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#ff004f] fill-[#ff004f] animate-pulse" />
+            <Zap className="w-4 h-4 text-[#ff004f] fill-[#ff004f] animate-pulse motion-reduce:animate-none flex-shrink-0" aria-hidden="true" />
             <span className="font-bold text-[#ff004f] uppercase tracking-wider">DOUBLE POINTS ACTIVE:</span>
             <span className="text-gray-300">Officials activated 2X scoring (Correct: +200 | Wrong: -100 | Red Light: -100)</span>
           </div>
@@ -234,7 +242,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
           {/* Question Sequence Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-800/80">
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 rounded-md bg-[#ff004f]/20 border border-[#ff004f]/40 font-mono text-xs font-bold text-[#ff004f] uppercase">
+              <span className="px-3 py-1 rounded-md bg-[#ff004f]/20 border border-[#ff004f]/40 font-mono text-xs font-bold text-[#ff004f] uppercase tabular-nums">
                 QUESTION {questionNumber} OF {totalQuestions}
               </span>
               <span className="font-mono text-xs text-gray-400">
@@ -242,7 +250,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
               </span>
             </div>
             <div className="font-mono text-xs text-gray-400">
-              Value: <span className="text-white font-bold">{isDoublePoints ? '+200 / -100' : '+100 / -50'}</span> pts
+              Value: <span className="text-white font-bold tabular-nums">{isDoublePoints ? '+200 / -100' : '+100 / -50'}</span> pts
             </div>
           </div>
 
@@ -260,7 +268,11 @@ export const Round1View: React.FC<Round1ViewProps> = ({
           </div>
 
           {/* Options */}
-          <div className="space-y-3 pt-2">
+          <div
+            className="space-y-3 pt-2"
+            role="radiogroup"
+            aria-label="Multiple choice answers"
+          >
             {Array.isArray(currentQuestion.options) &&
               currentQuestion.options.map((opt: { id: string; text: string }) => {
                 const isSelected = selectedOption === opt.id;
@@ -268,9 +280,12 @@ export const Round1View: React.FC<Round1ViewProps> = ({
                 return (
                   <button
                     key={opt.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
                     disabled={isSubmitting || isPaused || isEnded}
                     onClick={() => handleSelectOption(opt.id)}
-                    className={`w-full text-left p-4 rounded-xl border font-mono text-sm transition-all flex items-start gap-3 cursor-pointer ${
+                    className={`w-full text-left p-4 rounded-xl border font-mono text-sm transition-all flex items-start gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
                       isSelected
                         ? 'bg-[#ff004f]/20 border-[#ff004f] text-white shadow-[0_0_15px_rgba(255,0,79,0.3)]'
                         : 'bg-black/30 border-gray-800 text-gray-300 hover:border-gray-700 hover:bg-black/50'
@@ -294,6 +309,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
           {/* Submission Feedback Banner */}
           {feedback && (
             <div
+              role="alert"
               className={`p-4 rounded-xl font-mono text-xs flex items-center gap-3 ${
                 feedback.type === 'success'
                   ? 'bg-[#00e676]/10 border border-[#00e676]/30 text-[#00e676]'
@@ -303,14 +319,14 @@ export const Round1View: React.FC<Round1ViewProps> = ({
               }`}
             >
               {feedback.type === 'success' ? (
-                <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-[#00e676]" />
+                <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-[#00e676]" aria-hidden="true" />
               ) : (
-                <XCircle className="w-5 h-5 flex-shrink-0 text-red-400" />
+                <XCircle className="w-5 h-5 flex-shrink-0 text-red-400" aria-hidden="true" />
               )}
               <div className="flex-1">
                 <p className="font-bold">{feedback.message}</p>
                 {typeof feedback.points === 'number' && (
-                  <p className="text-[11px] opacity-80 mt-0.5">
+                  <p className="text-[11px] opacity-80 mt-0.5 tabular-nums">
                     Score impact: {feedback.points > 0 ? `+${feedback.points}` : feedback.points} pts
                   </p>
                 )}
@@ -320,8 +336,11 @@ export const Round1View: React.FC<Round1ViewProps> = ({
 
           {/* Red Light Submission Warning (Active in RED light, but button remains clickable) */}
           {isRed && !feedback && (
-            <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-800/80 flex items-center gap-3 text-red-300 font-mono text-xs">
-              <ShieldAlert className="w-5 h-5 text-red-400 flex-shrink-0 animate-pulse" />
+            <div
+              role="status"
+              className="p-3.5 rounded-xl bg-red-950/40 border border-red-800/80 flex items-center gap-3 text-red-300 font-mono text-xs"
+            >
+              <ShieldAlert className="w-5 h-5 text-red-400 flex-shrink-0 animate-pulse motion-reduce:animate-none" aria-hidden="true" />
               <div>
                 <span className="font-bold text-red-400 uppercase tracking-wider">RED LIGHT ACTIVE: </span>
                 <span>Submissions are penalized! Submitting now will deduct {isDoublePoints ? '100' : '50'} points regardless of answer correctness.</span>
@@ -331,30 +350,30 @@ export const Round1View: React.FC<Round1ViewProps> = ({
 
           {/* Controls Footer */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-800/80">
-            <span className="text-xs font-mono text-gray-500">
+            <span className="text-xs font-mono text-gray-500 tabular-nums">
               Sequential Challenge: Question {questionNumber} must be completed to unlock Question {Math.min(totalQuestions, questionNumber + 1)}.
             </span>
 
             <button
               onClick={handleSubmit}
               disabled={!selectedOption || isSubmitting || isPaused || isEnded}
-              className={`w-full sm:w-auto px-8 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`w-full sm:w-auto px-8 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
                 isRed
-                  ? 'bg-red-600 hover:bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]'
-                  : 'bg-[#ff004f] hover:bg-[#ff004f]/90 text-white shadow-[0_0_15px_rgba(255,0,79,0.4)]'
+                  ? 'bg-red-600 hover:bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] focus-visible:ring-red-500'
+                  : 'bg-[#ff004f] hover:bg-[#ff004f]/90 text-white shadow-[0_0_15px_rgba(255,0,79,0.4)] focus-visible:ring-[#ff004f]'
               } ${(!selectedOption || isSubmitting || isPaused || isEnded) ? 'opacity-40 cursor-not-allowed shadow-none' : ''}`}
             >
               {isSubmitting ? (
                 <span>Validating with Central Engine...</span>
               ) : isRed ? (
                 <>
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>Submit During Red Light (-{isDoublePoints ? '100' : '50'} pts)</span>
+                  <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+                  <span className="tabular-nums">Submit During Red Light (-{isDoublePoints ? '100' : '50'} pts)</span>
                 </>
               ) : (
                 <>
                   <span>Submit Answer</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </>
               )}
             </button>
@@ -362,7 +381,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
         </div>
       ) : (
         <div className="p-8 text-center bg-[#12151c] rounded-2xl border border-gray-800">
-          <HelpCircle className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+          <HelpCircle className="w-12 h-12 text-gray-500 mx-auto mb-3" aria-hidden="true" />
           <h3 className="font-display font-bold text-lg text-white">No Active Question</h3>
           <p className="text-sm font-mono text-gray-400 mt-1">Waiting for tournament officials.</p>
         </div>
