@@ -20,6 +20,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { RestartGameModal } from '../../components/admin/RestartGameModal';
+import { AdminStatusStrip, AdminSyncStatus } from '../../components/admin/AdminStatusStrip';
 
 export const AdminDashboard: React.FC = () => {
   const [data, setData] = useState<any>(null);
@@ -31,6 +32,9 @@ export const AdminDashboard: React.FC = () => {
   const [isRestarting, setIsRestarting] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'leaderboard' | 'qrcodes' | 'submissions'>('leaderboard');
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [pollErrorCount, setPollErrorCount] = useState<number>(0);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchAll = async () => {
     try {
@@ -40,8 +44,14 @@ export const AdminDashboard: React.FC = () => {
       ]);
       setData(dashRes);
       setLeaderboard(leadRes.teams || []);
+      setLastUpdated(new Date());
+      setPollErrorCount(0);
+      setFetchError(null);
     } catch (err) {
       console.error(err);
+      setPollErrorCount((prev) => prev + 1);
+      const errMsg = err instanceof Error ? err.message : 'Telemetry sync failed';
+      setFetchError(errMsg);
     } finally {
       setIsLoading(false);
     }
@@ -72,8 +82,8 @@ export const AdminDashboard: React.FC = () => {
       });
       setMessage(`Signal successfully broadcast as ${signalState}.`);
       await fetchAll();
-    } catch (err: any) {
-      setMessage(`Signal error: ${err.message}`);
+    } catch (err: unknown) {
+      setMessage(`Signal error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsActionLoading(false);
     }
@@ -94,8 +104,8 @@ export const AdminDashboard: React.FC = () => {
       });
       setMessage(`Double Points mode is now ${newValue ? 'ENABLED (2X)' : 'DISABLED (Normal)'}.`);
       await fetchAll();
-    } catch (err: any) {
-      setMessage(`Double Points error: ${err.message}`);
+    } catch (err: unknown) {
+      setMessage(`Double Points error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsActionLoading(false);
     }
@@ -105,7 +115,7 @@ export const AdminDashboard: React.FC = () => {
     setIsActionLoading(true);
     setMessage(null);
     try {
-      const body: any = {};
+      const body: Record<string, boolean> = {};
       if (action === 'start') {
         body.startTimer = true;
       } else if (action === 'pause') {
@@ -127,8 +137,8 @@ export const AdminDashboard: React.FC = () => {
 
       setMessage(`Round ${roundId} ${action.toUpperCase()} command successfully executed.`);
       await fetchAll();
-    } catch (err: any) {
-      setMessage(`Round control error: ${err.message}`);
+    } catch (err: unknown) {
+      setMessage(`Round control error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsActionLoading(false);
     }
@@ -147,15 +157,63 @@ export const AdminDashboard: React.FC = () => {
       setMessage(res.message || 'Game successfully restarted to initial state.');
       setIsRestartModalOpen(false);
       await fetchAll();
-    } catch (err: any) {
-      setMessage(`Restart error: ${err.message}`);
+    } catch (err: unknown) {
+      setMessage(`Restart error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsRestarting(false);
     }
   };
 
-  if (isLoading || !data) {
-    return <div className="p-8 font-mono text-sm text-gray-400">CONNECTING TO EVENT MISSION CONTROL...</div>;
+  const syncStatus: AdminSyncStatus = (() => {
+    if (!lastUpdated) return 'offline';
+    if (pollErrorCount >= 3) return 'offline';
+    if (pollErrorCount > 0) return 'stale';
+    const elapsed = Date.now() - lastUpdated.getTime();
+    if (elapsed > 16000) return 'offline';
+    if (elapsed > 8000) return 'stale';
+    return 'live';
+  })();
+
+  if (isLoading && !data) {
+    return (
+      <div className="p-8 font-mono text-sm text-gray-400 flex items-center gap-3">
+        <Activity className="w-4 h-4 animate-spin text-[#ff004f]" />
+        <span>CONNECTING TO EVENT MISSION CONTROL...</span>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="space-y-6 max-w-7xl mx-auto">
+        <AdminStatusStrip
+          status={syncStatus}
+          lastUpdated={lastUpdated}
+          pollIntervalSeconds={4}
+        />
+        {fetchError && (
+          <div
+            role="alert"
+            className="p-6 rounded-2xl bg-red-950/60 border border-red-800 text-red-200 font-mono text-xs space-y-3 shadow-lg"
+          >
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="w-5 h-5 text-[#ff004f] flex-shrink-0" />
+              <span className="font-bold text-sm text-white">Central Operations Connection Failed</span>
+            </div>
+            <p className="text-gray-300">{fetchError}</p>
+            <button
+              onClick={() => {
+                setIsLoading(true);
+                fetchAll();
+              }}
+              className="px-4 py-2 rounded-xl bg-red-900/60 hover:bg-red-800 border border-red-700 text-white font-mono text-xs transition-colors cursor-pointer"
+            >
+              Retry Connection
+            </button>
+          </div>
+        )}
+      </div>
+    );
   }
 
   const { stats, rounds, recentSubmissions } = data;
@@ -170,6 +228,35 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
+      {/* 0. Admin Status Strip derived ONLY from existing 4s poll + lastUpdated */}
+      <AdminStatusStrip
+        status={syncStatus}
+        lastUpdated={lastUpdated}
+        pollIntervalSeconds={4}
+      />
+
+      {/* Visible Error Banner on fetchAll failure */}
+      {fetchError && (
+        <div
+          role="alert"
+          className="p-4 rounded-xl bg-red-950/60 border border-red-800 text-red-200 font-mono text-xs flex items-center justify-between gap-3 shadow-lg"
+        >
+          <div className="flex items-center gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-[#ff004f] flex-shrink-0" />
+            <div>
+              <span className="font-bold text-white block">Operations Telemetry Sync Failed</span>
+              <span>{fetchError} (Automated 4s retry active)</span>
+            </div>
+          </div>
+          <button
+            onClick={() => fetchAll()}
+            className="px-3 py-1.5 rounded-lg bg-red-900/60 hover:bg-red-800 border border-red-700 text-white font-mono text-xs transition-colors cursor-pointer flex-shrink-0"
+          >
+            Retry Now
+          </button>
+        </div>
+      )}
+
       {/* Mission Control Title Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-5">
         <div>
@@ -207,9 +294,13 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Status Notice Banner */}
+      {/* Status Notice Banner (at most one live region for status notices) */}
       {message && (
-        <div className="p-4 rounded-xl bg-gray-900 border border-cyan-800/60 text-cyan-300 font-mono text-xs flex items-center justify-between gap-2 shadow-lg">
+        <div
+          role="status"
+          aria-live="polite"
+          className="p-4 rounded-xl bg-gray-900 border border-cyan-800/60 text-cyan-300 font-mono text-xs flex items-center justify-between gap-2 shadow-lg"
+        >
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-[#00e676]" />
             <span>{message}</span>
@@ -627,22 +718,30 @@ export const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/60">
-                {leaderboard.map((t, idx) => (
-                  <tr key={t.teamCode} className="hover:bg-gray-800/30">
-                    <td className="py-2.5 px-3 text-center font-bold text-gray-500">#{idx + 1}</td>
-                    <td className="py-2.5 px-3">
-                      <span className="font-bold text-white mr-2">{t.teamCode}</span>
-                      <span className="text-gray-300">{t.name}</span>
-                      {t.finalBreachCompletedAt && (
-                        <Flame className="w-3.5 h-3.5 text-[#ff004f] inline-block ml-1.5 animate-pulse motion-reduce:animate-none" />
-                      )}
+                {leaderboard.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 px-4 text-center text-gray-500 font-mono text-xs">
+                      No squad rankings available yet.
                     </td>
-                    <td className="py-2.5 px-3 text-center text-gray-300">{t.r1Score}</td>
-                    <td className="py-2.5 px-3 text-center text-gray-300">{t.r2Score}</td>
-                    <td className="py-2.5 px-3 text-center text-gray-300">{t.r3Score}</td>
-                    <td className="py-2.5 px-3 text-right font-bold text-[#00e676] text-sm">{t.totalScore} PTS</td>
                   </tr>
-                ))}
+                ) : (
+                  leaderboard.map((t, idx) => (
+                    <tr key={t.teamCode} className="hover:bg-gray-800/30">
+                      <td className="py-2.5 px-3 text-center font-bold text-gray-500">#{idx + 1}</td>
+                      <td className="py-2.5 px-3">
+                        <span className="font-bold text-white mr-2">{t.teamCode}</span>
+                        <span className="text-gray-300">{t.name}</span>
+                        {t.finalBreachCompletedAt && (
+                          <Flame className="w-3.5 h-3.5 text-[#ff004f] inline-block ml-1.5 animate-pulse motion-reduce:animate-none" />
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-center text-gray-300">{t.r1Score}</td>
+                      <td className="py-2.5 px-3 text-center text-gray-300">{t.r2Score}</td>
+                      <td className="py-2.5 px-3 text-center text-gray-300">{t.r3Score}</td>
+                      <td className="py-2.5 px-3 text-right font-bold text-[#00e676] text-sm">{t.totalScore} PTS</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -696,34 +795,42 @@ export const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/60">
-                {recentSubmissions?.map((s: any) => (
-                  <tr key={s.id} className="hover:bg-gray-800/30">
-                    <td className="py-2.5 px-3 text-gray-500">
-                      {new Date(s.createdAt).toLocaleTimeString()}
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <span className="font-bold text-white mr-1.5">{s.team?.teamCode}</span>
-                      <span className="text-gray-400">{s.team?.name}</span>
-                    </td>
-                    <td className="py-2.5 px-3 text-center text-gray-300">R{s.round}</td>
-                    <td className="py-2.5 px-3">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          s.status === 'CORRECT'
-                            ? 'bg-[#00e676]/20 text-[#00e676]'
-                            : s.status === 'PENALIZED'
-                            ? 'bg-red-950 text-red-400'
-                            : 'bg-red-900/30 text-red-300'
-                        }`}
-                      >
-                        {s.status}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-bold text-gray-200">
-                      {s.pointsAwarded > 0 ? `+${s.pointsAwarded}` : s.pointsAwarded}
+                {!recentSubmissions || recentSubmissions.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 px-4 text-center text-gray-500 font-mono text-xs">
+                      No recent submissions recorded yet.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  recentSubmissions.map((s: any) => (
+                    <tr key={s.id} className="hover:bg-gray-800/30">
+                      <td className="py-2.5 px-3 text-gray-500">
+                        {new Date(s.createdAt).toLocaleTimeString()}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className="font-bold text-white mr-1.5">{s.team?.teamCode}</span>
+                        <span className="text-gray-400">{s.team?.name}</span>
+                      </td>
+                      <td className="py-2.5 px-3 text-center text-gray-300">R{s.round}</td>
+                      <td className="py-2.5 px-3">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            s.status === 'CORRECT'
+                              ? 'bg-[#00e676]/20 text-[#00e676]'
+                              : s.status === 'PENALIZED'
+                              ? 'bg-red-950 text-red-400'
+                              : 'bg-red-900/30 text-red-300'
+                          }`}
+                        >
+                          {s.status}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-bold text-gray-200">
+                        {s.pointsAwarded > 0 ? `+${s.pointsAwarded}` : s.pointsAwarded}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -740,3 +847,4 @@ export const AdminDashboard: React.FC = () => {
     </div>
   );
 };
+export default AdminDashboard;

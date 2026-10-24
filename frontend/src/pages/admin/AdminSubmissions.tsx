@@ -81,37 +81,51 @@ export const AdminSubmissions: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800/60 text-gray-300">
-              {submissions.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-800/30">
-                  <td className="py-3 px-3 text-gray-500">{new Date(s.createdAt).toLocaleTimeString()}</td>
-                  <td className="py-3 px-3 font-bold text-white">
-                    {s.team?.teamCode} ({s.team?.name})
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} className="py-8 px-4 text-center text-gray-500 font-mono text-xs">
+                    Loading submissions stream...
                   </td>
-                  <td className="py-3 px-3 text-[#00f0ff]">
-                    R{s.round}.S{s.stage} {s.question ? `(Q${s.question.orderIndex})` : ''}
-                  </td>
-                  <td className="py-3 px-3 font-semibold text-gray-200 max-w-xs truncate">
-                    {s.submittedValue}
-                    {s.doublePointsSelected && (
-                      <span className="ml-1 text-amber-400 text-[10px] font-bold">[2X]</span>
-                    )}
-                  </td>
-                  <td className="py-3 px-3">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      s.status === 'CORRECT' ? 'bg-[#00e676]/20 text-[#00e676]' :
-                      s.status === 'PENALIZED' ? 'bg-[#ff004f]/20 text-[#ff004f]' :
-                      s.status === 'REJECTED' ? 'bg-amber-500/20 text-amber-400' :
-                      'bg-gray-800 text-gray-400'
-                    }`}>
-                      {s.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-3 font-bold text-[#00e676]">
-                    {s.pointsAwarded > 0 ? `+${s.pointsAwarded}` : s.pointsAwarded}
-                  </td>
-                  <td className="py-3 px-3 text-xs">{s.signalAtSubmission}</td>
                 </tr>
-              ))}
+              ) : submissions.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-8 px-4 text-center text-gray-500 font-mono text-xs">
+                    No submissions recorded yet{roundFilter ? ` for Protocol ${roundFilter}` : ''}.
+                  </td>
+                </tr>
+              ) : (
+                submissions.map((s) => (
+                  <tr key={s.id} className="hover:bg-gray-800/30">
+                    <td className="py-3 px-3 text-gray-500">{new Date(s.createdAt).toLocaleTimeString()}</td>
+                    <td className="py-3 px-3 font-bold text-white">
+                      {s.team?.teamCode} ({s.team?.name})
+                    </td>
+                    <td className="py-3 px-3 text-[#00f0ff]">
+                      R{s.round}.S{s.stage} {s.question ? `(Q${s.question.orderIndex})` : ''}
+                    </td>
+                    <td className="py-3 px-3 font-semibold text-gray-200 max-w-xs truncate">
+                      {s.submittedValue}
+                      {s.doublePointsSelected && (
+                        <span className="ml-1 text-amber-400 text-[10px] font-bold">[2X]</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-3">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        s.status === 'CORRECT' ? 'bg-[#00e676]/20 text-[#00e676]' :
+                        s.status === 'PENALIZED' ? 'bg-[#ff004f]/20 text-[#ff004f]' :
+                        s.status === 'REJECTED' ? 'bg-amber-500/20 text-amber-400' :
+                        'bg-gray-800 text-gray-400'
+                      }`}>
+                        {s.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 font-bold text-[#00e676]">
+                      {s.pointsAwarded > 0 ? `+${s.pointsAwarded}` : s.pointsAwarded}
+                    </td>
+                    <td className="py-3 px-3 text-xs">{s.signalAtSubmission}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -119,3 +133,4 @@ export const AdminSubmissions: React.FC = () => {
     </div>
   );
 };
+export default AdminSubmissions;
