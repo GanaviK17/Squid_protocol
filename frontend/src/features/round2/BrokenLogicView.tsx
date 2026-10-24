@@ -21,7 +21,7 @@ export const BrokenLogicView: React.FC<BrokenLogicViewProps> = ({ data, onSucces
   if (!data.isUnlocked) {
     return (
       <div className="p-8 text-center bg-[#12151c]/60 rounded-2xl border border-gray-800/80">
-        <Lock className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+        <Lock className="w-10 h-10 text-gray-600 mx-auto mb-3" aria-hidden="true" />
         <h4 className="font-display font-bold text-lg text-gray-400">STAGE 2 LOCKED — THE BROKEN LOGIC</h4>
         <p className="text-xs font-mono text-gray-500 mt-1">
           Complete Stage 1 Shape Sudoku to breach this security layer.
@@ -71,7 +71,7 @@ export const BrokenLogicView: React.FC<BrokenLogicViewProps> = ({ data, onSucces
 
         {data.isCompleted ? (
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00e676]/20 border border-[#00e676]/40 text-[#00e676] font-mono text-xs font-bold">
-            <ShieldCheck className="w-4 h-4" />
+            <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             <span>SOLVED & UNLOCKED (+200 PTS)</span>
           </div>
         ) : (
@@ -84,7 +84,7 @@ export const BrokenLogicView: React.FC<BrokenLogicViewProps> = ({ data, onSucces
       <div className="space-y-4">
         <div className="p-4 rounded-xl bg-[#181c26] border border-gray-800">
           <h4 className="font-mono text-xs text-amber-400 font-semibold mb-2 flex items-center gap-1.5">
-            <AlertTriangle className="w-4 h-4" />
+            <AlertTriangle className="w-4 h-4" aria-hidden="true" />
             SYSTEM DIAGNOSTIC REPORT:
           </h4>
           <p className="text-sm font-mono text-gray-200 whitespace-pre-line leading-relaxed">
@@ -95,7 +95,7 @@ export const BrokenLogicView: React.FC<BrokenLogicViewProps> = ({ data, onSucces
         {puzzle?.codeSnippet && (
           <div className="space-y-2">
             <span className="font-mono text-xs text-gray-400 flex items-center gap-1.5">
-              <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+              <Terminal className="w-3.5 h-3.5 text-cyan-400" aria-hidden="true" />
               DECOMPILED ALGORITHM:
             </span>
             <pre className="p-4 rounded-xl bg-[#090b0f] border border-gray-800 text-cyan-300 font-mono text-xs sm:text-sm overflow-x-auto">
@@ -107,13 +107,14 @@ export const BrokenLogicView: React.FC<BrokenLogicViewProps> = ({ data, onSucces
 
       {feedback && (
         <div
+          role="alert"
           className={`p-4 rounded-xl border flex items-center gap-3 font-mono text-xs sm:text-sm ${
             feedback.isError
               ? 'bg-red-950/30 border-red-800 text-red-400'
               : 'bg-[#00e676]/15 border-[#00e676]/40 text-[#00e676]'
           }`}
         >
-          {feedback.isError ? <AlertTriangle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+          {feedback.isError ? <AlertTriangle className="w-4 h-4 flex-shrink-0" aria-hidden="true" /> : <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#00e676]" aria-hidden="true" />}
           <span>{feedback.message}</span>
         </div>
       )}
@@ -121,23 +122,27 @@ export const BrokenLogicView: React.FC<BrokenLogicViewProps> = ({ data, onSucces
       {!data.isCompleted && (
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-3 pt-2">
           <div className="relative w-full sm:w-80">
+            <label htmlFor="broken-logic-accumulator" className="sr-only">
+              Expected Accumulator Output
+            </label>
             <input
+              id="broken-logic-accumulator"
               type="text"
               value={outputVal}
               onChange={(e) => setOutputVal(e.target.value)}
               placeholder="Enter expected accumulator value..."
-              className="w-full px-4 py-3 rounded-xl bg-[#090b0f] border border-gray-800 text-white font-mono text-sm placeholder-gray-600 focus:outline-none focus:border-[#ff004f] transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-[#090b0f] border border-gray-800 text-white font-mono text-sm placeholder-gray-600 focus:outline-none focus:border-[#ff004f] focus-visible:ring-2 focus-visible:ring-[#ff004f] transition-colors"
             />
           </div>
           <button
             type="submit"
             disabled={!outputVal.trim() || isSubmitting}
-            className={`w-full sm:w-auto px-6 py-3 rounded-xl font-display font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all ${
+            className={`w-full sm:w-auto px-6 py-3 rounded-xl font-display font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
               !outputVal.trim()
                 ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
                 : isSubmitting
                 ? 'bg-gray-700 text-gray-300'
-                : 'bg-[#ff004f] text-white hover:bg-[#ff2e7e] shadow-[0_0_20px_rgba(255,0,79,0.35)] cursor-pointer'
+                : 'bg-[#ff004f] text-white hover:bg-[#ff2e7e] shadow-[0_0_20px_rgba(255,0,79,0.35)]'
             }`}
           >
             {isSubmitting ? (
@@ -145,7 +150,7 @@ export const BrokenLogicView: React.FC<BrokenLogicViewProps> = ({ data, onSucces
             ) : (
               <>
                 <span>VALIDATE ACCUMULATOR</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </>
             )}
           </button>

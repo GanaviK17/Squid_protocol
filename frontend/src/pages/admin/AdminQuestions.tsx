@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { apiRequest } from '../../services/api';
 import { FileQuestion, Edit2, CheckCircle2, X } from 'lucide-react';
 
@@ -20,6 +20,24 @@ export const AdminQuestions: React.FC = () => {
   const [questions, setQuestions] = useState<QuestionItem[]>([]);
   const [editingQ, setEditingQ] = useState<QuestionItem | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (editingQ) {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          handleCloseModal();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [editingQ]);
+
+  const handleCloseModal = () => {
+    setEditingQ(null);
+    triggerRef.current?.focus();
+  };
 
   const fetchQuestions = async () => {
     try {
@@ -76,31 +94,33 @@ export const AdminQuestions: React.FC = () => {
       {/* Edit Modal */}
       {editingQ && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#12151c] rounded-2xl border border-gray-700 p-6 sm:p-8 max-w-2xl w-full space-y-4 my-8 shadow-2xl">
+          <div role="dialog" aria-modal="true" aria-labelledby="edit-question-dialog-title" className="bg-[#12151c] rounded-2xl border border-gray-700 p-6 sm:p-8 max-w-2xl w-full space-y-4 my-8 shadow-2xl focus:outline-none">
             <div className="flex items-center justify-between border-b border-gray-800 pb-3">
-              <h3 className="font-display font-bold text-lg text-white">
+              <h3 id="edit-question-dialog-title" className="font-display font-bold text-lg text-white">
                 Edit Question #{editingQ.orderIndex} ({editingQ.topic})
               </h3>
-              <button onClick={() => setEditingQ(null)} className="text-gray-400 hover:text-white">
+              <button type="button" onClick={handleCloseModal} aria-label="Close edit question dialog" className="text-gray-400 hover:text-white p-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSaveQuestion} className="space-y-4 font-mono text-xs">
               <div>
-                <label className="text-gray-400 uppercase block mb-1">Topic</label>
+                <label htmlFor="question-topic" className="text-gray-400 uppercase block mb-1">Topic</label>
                 <input
                   type="text"
+                  id="question-topic"
                   value={editingQ.topic}
                   onChange={(e) => setEditingQ({ ...editingQ, topic: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm"
+                  className="w-full px-3.5 py-2 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:outline-none focus:border-[#ff004f] focus-visible:ring-2 focus-visible:ring-[#ff004f]"
                   required
                 />
               </div>
 
               <div>
-                <label className="text-gray-400 uppercase block mb-1">Prompt</label>
+                <label htmlFor="question-prompt" className="text-gray-400 uppercase block mb-1">Prompt</label>
                 <textarea
+                  id="question-prompt"
                   rows={3}
                   value={editingQ.prompt}
                   onChange={(e) => setEditingQ({ ...editingQ, prompt: e.target.value })}
@@ -110,9 +130,10 @@ export const AdminQuestions: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-gray-400 uppercase block mb-1">Code Snippet (Optional)</label>
+                <label htmlFor="question-code-snippet" className="text-gray-400 uppercase block mb-1">Code Snippet (Optional)</label>
                 <textarea
                   rows={2}
+                  id="question-code-snippet"
                   value={editingQ.codeSnippet || ''}
                   onChange={(e) => setEditingQ({ ...editingQ, codeSnippet: e.target.value || null })}
                   className="w-full px-3.5 py-2 rounded-lg bg-[#090b0f] border border-gray-800 text-cyan-300 font-mono text-xs"
@@ -121,8 +142,9 @@ export const AdminQuestions: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-gray-400 uppercase block mb-1">Correct Answer Choice</label>
+                  <label htmlFor="question-correct-option" className="text-gray-400 uppercase block mb-1">Correct Answer Choice</label>
                   <select
+                    id="question-correct-option"
                     value={editingQ.correctOption}
                     onChange={(e) => setEditingQ({ ...editingQ, correctOption: e.target.value })}
                     className="w-full px-3.5 py-2 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm font-bold"
@@ -135,20 +157,22 @@ export const AdminQuestions: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-gray-400 uppercase block mb-1">Normal Points</label>
+                  <label htmlFor="question-points-normal" className="text-gray-400 uppercase block mb-1">Normal Points</label>
                   <input
                     type="number"
+                    id="question-points-normal"
                     value={editingQ.pointsNormal}
                     onChange={(e) => setEditingQ({ ...editingQ, pointsNormal: parseInt(e.target.value, 10) })}
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm"
+                    className="w-full px-3.5 py-2 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:outline-none focus:border-[#ff004f] focus-visible:ring-2 focus-visible:ring-[#ff004f]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-gray-400 uppercase block mb-1">Explanation</label>
+                <label htmlFor="question-explanation" className="text-gray-400 uppercase block mb-1">Explanation</label>
                 <textarea
                   rows={2}
+                  id="question-explanation"
                   value={editingQ.explanation}
                   onChange={(e) => setEditingQ({ ...editingQ, explanation: e.target.value })}
                   className="w-full px-3.5 py-2 rounded-lg bg-[#090b0f] border border-gray-800 text-gray-300 font-mono text-xs"
@@ -158,14 +182,14 @@ export const AdminQuestions: React.FC = () => {
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-800">
                 <button
                   type="button"
-                  onClick={() => setEditingQ(null)}
-                  className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  onClick={handleCloseModal}
+                  className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-[#ff004f] text-white hover:bg-[#ff2e7e] font-bold"
+                  className="px-5 py-2 rounded-lg bg-[#ff004f] text-white hover:bg-[#ff2e7e] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] cursor-pointer"
                 >
                   Save Question
                 </button>
@@ -191,8 +215,9 @@ export const AdminQuestions: React.FC = () => {
                   KEY: {q.correctOption}
                 </span>
                 <button
-                  onClick={() => setEditingQ(q)}
-                  className="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono text-xs flex items-center gap-1 transition-colors"
+                  onClick={(e) => { triggerRef.current = e.currentTarget; setEditingQ(q); }}
+                  aria-label={`Edit question ${q.orderIndex}`}
+                  className="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono text-xs flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] cursor-pointer"
                 >
                   <Edit2 className="w-3 h-3" />
                   <span>Edit</span>

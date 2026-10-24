@@ -46,6 +46,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-[#06070a] text-gray-100 flex flex-col md:flex-row font-sans selection:bg-[#ff004f] selection:text-white">
+      {/* Skip to Main Content Link for Keyboard Users */}
+      <a
+        href="#admin-main"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-[#ff004f] focus:text-white focus:font-mono focus:text-xs focus:font-bold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-white"
+      >
+        Skip to main content
+      </a>
       {/* Dark Cyber Command Sidebar */}
       <aside className="w-full md:w-64 bg-[#0a0c10] border-r border-gray-800/80 flex flex-col justify-between flex-shrink-0">
         <div className="p-5 space-y-6">
@@ -67,7 +74,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </div>
 
           {/* Navigation Links */}
-          <nav className="space-y-1">
+          <nav className="space-y-1" aria-label="Admin navigation">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -76,7 +83,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-mono text-xs transition-colors ${
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] ${
                     isActive
                       ? 'bg-[#ff004f]/15 text-white border border-[#ff004f]/40 font-bold'
                       : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
@@ -101,14 +109,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <Link
               to="/leaderboard"
               target="_blank"
-              className="flex-1 py-1.5 px-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-300 text-[11px] flex items-center justify-center gap-1 transition-colors"
+              className="flex-1 py-1.5 px-2 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-300 text-[11px] flex items-center justify-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f]"
             >
               <span>Scoreboard</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
             <button
               onClick={handleLogout}
-              className="py-1.5 px-3 rounded-lg bg-red-950/40 hover:bg-red-900/50 border border-red-900/40 text-red-400 text-[11px] flex items-center gap-1 transition-colors"
+              className="py-1.5 px-3 rounded-lg bg-red-950/40 hover:bg-red-900/50 border border-red-900/40 text-red-400 text-[11px] flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 cursor-pointer"
             >
               <LogOut className="w-3 h-3" />
               <span>Exit</span>
@@ -118,7 +126,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       </aside>
 
       {/* Main Command Room Workspace */}
-      <main className="flex-1 p-6 sm:p-8 overflow-y-auto max-w-7xl">
+      <main id="admin-main" tabIndex={-1} className="flex-1 p-6 sm:p-8 overflow-y-auto max-w-7xl focus:outline-none">
         {children}
       </main>
     </div>

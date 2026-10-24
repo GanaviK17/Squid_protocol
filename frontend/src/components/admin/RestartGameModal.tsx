@@ -27,7 +27,7 @@ export const RestartGameModal: React.FC<RestartGameModalProps> = ({
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
-              <RotateCcw className="w-6 h-6 animate-spin-reverse" />
+              <RotateCcw className="w-6 h-6 animate-spin-reverse motion-reduce:animate-none" />
             </div>
             <div>
               <span className="font-mono text-[10px] text-amber-400 uppercase tracking-widest block font-bold">
@@ -39,9 +39,11 @@ export const RestartGameModal: React.FC<RestartGameModalProps> = ({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close restart confirmation dialog"
             disabled={isLoading}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -72,7 +74,7 @@ export const RestartGameModal: React.FC<RestartGameModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             Cancel
           </button>
@@ -80,7 +82,7 @@ export const RestartGameModal: React.FC<RestartGameModalProps> = ({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-mono text-xs font-black uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-mono text-xs font-black uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] flex items-center gap-2 cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
           >
             {isLoading ? (
               <>

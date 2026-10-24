@@ -8,7 +8,7 @@ interface AuditItem {
   action: string;
   targetType: string;
   targetId?: string | null;
-  details?: any;
+  details?: Record<string, unknown> | null;
   ipAddress?: string | null;
   createdAt: string;
 }
@@ -50,7 +50,8 @@ export const AdminAuditLogs: React.FC = () => {
 
         <button
           onClick={fetchLogs}
-          className="p-2 rounded-lg bg-[#12151c] border border-gray-800 text-gray-400 hover:text-white transition-colors self-start sm:self-auto"
+          aria-label="Refresh audit logs"
+          className="p-2 rounded-lg bg-[#12151c] border border-gray-800 text-gray-400 hover:text-white transition-colors self-start sm:self-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] cursor-pointer"
         >
           <RefreshCw className="w-4 h-4" />
         </button>
@@ -69,25 +70,39 @@ export const AdminAuditLogs: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800/60 text-gray-300">
-              {logs.map((log) => (
-                <tr key={log.id} className="hover:bg-gray-800/30">
-                  <td className="py-3 px-3 text-gray-500 whitespace-nowrap">
-                    {new Date(log.createdAt).toLocaleString()}
-                  </td>
-                  <td className="py-3 px-3 font-bold text-white">
-                    {log.adminUsername}
-                  </td>
-                  <td className="py-3 px-3 text-[#ff004f] font-semibold">
-                    {log.action}
-                  </td>
-                  <td className="py-3 px-3 text-cyan-300">
-                    {log.targetType} {log.targetId ? `(#${log.targetId})` : ''}
-                  </td>
-                  <td className="py-3 px-3 max-w-sm truncate text-gray-400 text-[11px]">
-                    {log.details ? JSON.stringify(log.details) : 'N/A'}
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="py-8 px-4 text-center text-gray-500 font-mono text-xs">
+                    Loading cryptographic audit ledger...
                   </td>
                 </tr>
-              ))}
+              ) : logs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 px-4 text-center text-gray-500 font-mono text-xs">
+                    No administrative audit actions recorded yet.
+                  </td>
+                </tr>
+              ) : (
+                logs.map((log) => (
+                  <tr key={log.id} className="hover:bg-gray-800/30">
+                    <td className="py-3 px-3 text-gray-500 whitespace-nowrap">
+                      {new Date(log.createdAt).toLocaleString()}
+                    </td>
+                    <td className="py-3 px-3 font-bold text-white">
+                      {log.adminUsername}
+                    </td>
+                    <td className="py-3 px-3 text-[#ff004f] font-semibold">
+                      {log.action}
+                    </td>
+                    <td className="py-3 px-3 text-cyan-300">
+                      {log.targetType} {log.targetId ? `(#${log.targetId})` : ''}
+                    </td>
+                    <td className="py-3 px-3 max-w-sm truncate text-gray-400 text-[11px]">
+                      {log.details ? JSON.stringify(log.details) : 'N/A'}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -95,3 +110,4 @@ export const AdminAuditLogs: React.FC = () => {
     </div>
   );
 };
+export default AdminAuditLogs;

@@ -47,7 +47,7 @@ export const Round3View: React.FC<Round3ViewProps> = ({
   if (isUpcoming || !isUnlocked) {
     return (
       <div className="bg-[#12151c] rounded-2xl border border-gray-800 p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-6">
-        <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-800/40 text-cyan-400 flex items-center justify-center mx-auto">
+        <div className="w-16 h-16 rounded-full bg-cyan-950/40 border border-cyan-800/40 text-cyan-400 flex items-center justify-center mx-auto" aria-hidden="true">
           <Lock className="w-8 h-8" />
         </div>
         <div className="space-y-2">
@@ -103,7 +103,7 @@ export const Round3View: React.FC<Round3ViewProps> = ({
       {/* Timer Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-[#12151c] border border-gray-800">
         <div className="flex items-center gap-3">
-          <Key className="w-5 h-5 text-[#ff004f]" />
+          <Key className="w-5 h-5 text-[#ff004f] flex-shrink-0" aria-hidden="true" />
           <div>
             <span className="font-display font-bold text-sm text-white tracking-wide block">
               ROUND 3: THE FINAL BREACH
@@ -124,8 +124,12 @@ export const Round3View: React.FC<Round3ViewProps> = ({
       </div>
 
       {isPaused && (
-        <div className="bg-amber-950/40 border border-amber-500/50 rounded-xl p-4 flex items-center gap-3 text-amber-300 font-mono text-sm">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-400 animate-pulse" />
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="bg-amber-950/40 border border-amber-500/50 rounded-xl p-4 flex items-center gap-3 text-amber-300 font-mono text-sm"
+        >
+          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-400 animate-pulse motion-reduce:animate-none" aria-hidden="true" />
           <div>
             <span className="font-bold uppercase tracking-wider">ROUND 3 CURRENTLY PAUSED: </span>
             <span>Timer is frozen by tournament officials. Submissions are temporarily suspended.</span>
@@ -135,37 +139,42 @@ export const Round3View: React.FC<Round3ViewProps> = ({
 
       {/* Screen 1: QR Code Redemption Gate (Challenge is strictly hidden until redeemed) */}
       {!isQrRedeemed && !isCompleted ? (
-        <div className="bg-[#12151c] rounded-2xl border border-gray-800 p-8 sm:p-10 max-w-2xl mx-auto space-y-6">
+        <div className="bg-[#12151c] rounded-2xl border border-gray-800 p-8 sm:p-10 max-w-2xl mx-auto space-y-6 shadow-2xl">
           <div className="text-center space-y-3">
-            <div className="w-16 h-16 rounded-full bg-[#ff004f]/20 border border-[#ff004f]/40 text-[#ff004f] flex items-center justify-center mx-auto">
+            <div className="w-16 h-16 rounded-full bg-[#ff004f]/20 border border-[#ff004f]/40 text-[#ff004f] flex items-center justify-center mx-auto" aria-hidden="true">
               <QrCode className="w-8 h-8" />
             </div>
             <h3 className="font-display font-bold text-2xl text-white">
               Enter Reconstructed QR Code
             </h3>
-            <p className="text-sm text-gray-300 leading-relaxed">
+            <p className="text-sm text-gray-300 leading-relaxed font-mono">
               Complete the offline physical challenge at the arena to reconstruct your team's QR fragment. Enter the code displayed on your QR code below to unlock the Final Online Debugging Challenge.
             </p>
           </div>
 
           <form onSubmit={handleRedeemCode} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono text-gray-400 uppercase tracking-wider">
+              <label
+                htmlFor="qr-redemption-code"
+                className="block text-xs font-mono text-gray-400 uppercase tracking-wider font-semibold"
+              >
                 QR Redemption Code
               </label>
               <input
+                id="qr-redemption-code"
                 type="text"
                 value={code}
                 disabled={isRedeeming || isPaused || isEnded}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="e.g. TEAM01#2026"
-                className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-gray-800 text-white font-mono text-sm uppercase placeholder:text-gray-600 focus:outline-none focus:border-[#ff004f] transition-colors"
+                className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-gray-800 text-white font-mono text-sm uppercase placeholder:text-gray-600 focus:outline-none focus:border-[#ff004f] focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] transition-colors"
                 autoFocus
               />
             </div>
 
             {feedback && (
               <div
+                role="alert"
                 className={`p-4 rounded-xl font-mono text-xs flex items-center gap-2.5 ${
                   feedback.isError
                     ? 'bg-red-950/40 border border-red-800 text-red-400'
@@ -173,9 +182,9 @@ export const Round3View: React.FC<Round3ViewProps> = ({
                 }`}
               >
                 {feedback.isError ? (
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 ) : (
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 )}
                 <span>{feedback.message}</span>
               </div>
@@ -184,10 +193,10 @@ export const Round3View: React.FC<Round3ViewProps> = ({
             <button
               type="submit"
               disabled={!code.trim() || isRedeeming || isPaused || isEnded}
-              className={`w-full py-3.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+              className={`w-full py-3.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
                 !code.trim() || isRedeeming || isPaused || isEnded
                   ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                  : 'bg-[#ff004f] hover:bg-[#ff004f]/90 text-white shadow-[0_0_15px_rgba(255,0,79,0.4)] cursor-pointer'
+                  : 'bg-[#ff004f] hover:bg-[#ff004f]/90 text-white shadow-[0_0_15px_rgba(255,0,79,0.4)]'
               }`}
             >
               {isRedeeming ? (
@@ -195,7 +204,7 @@ export const Round3View: React.FC<Round3ViewProps> = ({
               ) : (
                 <>
                   <span>Redeem QR Access Code</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </>
               )}
             </button>
@@ -213,7 +222,7 @@ export const Round3View: React.FC<Round3ViewProps> = ({
         <div className="space-y-6">
           <div className="p-4 rounded-xl bg-[#00e676]/10 border border-[#00e676]/30 flex items-center justify-between text-xs font-mono text-[#00e676]">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4" />
+              <ShieldCheck className="w-4 h-4" aria-hidden="true" />
               <span>QR ACCESS CODE VERIFIED — DEBUGGING PROTOCOL ACTIVATED (+200 PTS)</span>
             </div>
             {completedAt && (
