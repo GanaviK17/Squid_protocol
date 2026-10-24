@@ -70,7 +70,7 @@ export const AdminLiveControl: React.FC = () => {
       <SignalIndicator signal={signal} />
 
       {message && (
-        <div className="p-4 rounded-xl bg-gray-900 border border-gray-700 text-cyan-300 font-mono text-xs flex items-center gap-2">
+        <div role="status" className="p-4 rounded-xl bg-gray-900 border border-gray-700 text-cyan-300 font-mono text-xs flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-[#00e676]" />
           <span>{message}</span>
         </div>
@@ -78,7 +78,7 @@ export const AdminLiveControl: React.FC = () => {
 
       {/* Error Notice */}
       {error && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-400 font-mono text-xs flex items-center justify-between gap-2 shadow-lg">
+        <div role="alert" className="p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-400 font-mono text-xs flex items-center justify-between gap-2 shadow-lg">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-red-400" />
             <span>{error}</span>
@@ -122,15 +122,16 @@ export const AdminLiveControl: React.FC = () => {
         {/* 1. RED LIGHT BUTTON */}
         <button
           onClick={() => handleUpdate('RED', doublePoints)}
+          aria-pressed={signal === 'RED'}
           disabled={isUpdating}
-          className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer ${
+          className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
             signal === 'RED'
               ? 'bg-[#ff004f]/20 border-[#ff004f] shadow-[0_0_35px_rgba(255,0,79,0.5)] text-white ring-1 ring-[#ff004f]'
               : 'bg-[#12151c] border-gray-800 text-gray-400 hover:border-[#ff004f]/50 hover:text-white'
           } ${isUpdating ? 'opacity-60 cursor-not-allowed' : ''}`}
         >
           <div className="w-14 h-14 rounded-full bg-[#ff004f]/20 border-2 border-[#ff004f] flex items-center justify-center">
-            <span className={`w-6 h-6 rounded-full bg-[#ff004f] ${signal === 'RED' ? 'animate-ping' : ''}`} />
+            <span className={`w-6 h-6 rounded-full bg-[#ff004f] ${signal === 'RED' ? 'animate-ping motion-reduce:animate-none' : ''}`} />
           </div>
           <div className="text-center space-y-1">
             <span className="font-display font-black text-2xl tracking-wider uppercase text-[#ff004f] block">
@@ -148,15 +149,16 @@ export const AdminLiveControl: React.FC = () => {
         {/* 2. GREEN LIGHT BUTTON */}
         <button
           onClick={() => handleUpdate('GREEN', doublePoints)}
+          aria-pressed={signal === 'GREEN'}
           disabled={isUpdating}
-          className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer ${
+          className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
             signal === 'GREEN'
               ? 'bg-[#00e676]/20 border-[#00e676] shadow-[0_0_30px_rgba(0,230,118,0.4)] text-white ring-1 ring-[#00e676]'
               : 'bg-[#12151c] border-gray-800 text-gray-400 hover:border-[#00e676]/50 hover:text-white'
           } ${isUpdating ? 'opacity-60 cursor-not-allowed' : ''}`}
         >
           <div className="w-14 h-14 rounded-full bg-[#00e676]/20 border-2 border-[#00e676] flex items-center justify-center">
-            <span className={`w-6 h-6 rounded-full bg-[#00e676] ${signal === 'GREEN' ? 'animate-pulse' : ''}`} />
+            <span className={`w-6 h-6 rounded-full bg-[#00e676] ${signal === 'GREEN' ? 'animate-pulse motion-reduce:animate-none' : ''}`} />
           </div>
           <div className="text-center space-y-1">
             <span className="font-display font-black text-2xl tracking-wider uppercase text-[#00e676] block">
@@ -174,8 +176,9 @@ export const AdminLiveControl: React.FC = () => {
         {/* 3. DOUBLE POINTS ON/OFF BUTTON */}
         <button
           onClick={() => handleUpdate(signal, !doublePoints)}
+          aria-pressed={doublePoints}
           disabled={isUpdating}
-          className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer ${
+          className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
             doublePoints
               ? 'bg-[#ffd166]/15 border-[#ffd166] shadow-[0_0_30px_rgba(255,209,102,0.35)] text-white ring-1 ring-[#ffd166]'
               : 'bg-[#12151c] border-gray-800 text-gray-400 hover:border-[#ffd166]/50 hover:text-white'
@@ -186,7 +189,7 @@ export const AdminLiveControl: React.FC = () => {
               ? 'bg-[#ffd166]/20 border-[#ffd166] text-[#ffd166]'
               : 'bg-gray-800 border-gray-700 text-gray-500'
           }`}>
-            <Zap className={`w-7 h-7 ${doublePoints ? 'fill-[#ffd166] animate-bounce' : ''}`} />
+            <Zap className={`w-7 h-7 ${doublePoints ? 'fill-[#ffd166] animate-bounce motion-reduce:animate-none' : ''}`} />
           </div>
           <div className="text-center space-y-1">
             <span className={`font-display font-black text-2xl tracking-wider uppercase block ${

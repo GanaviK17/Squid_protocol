@@ -93,7 +93,7 @@ export const AdminIndex: React.FC = () => {
         </div>
 
         {errorMessage && (
-          <div className="p-3.5 rounded-xl bg-red-950/30 border border-red-800 text-red-400 font-mono text-xs flex items-center gap-2">
+          <div role="alert" className="p-3.5 rounded-xl bg-red-950/30 border border-red-800 text-red-400 font-mono text-xs flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             <span>{errorMessage}</span>
           </div>
@@ -101,30 +101,32 @@ export const AdminIndex: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4 font-mono text-xs">
           <div className="space-y-1.5">
-            <label className="text-gray-400 uppercase tracking-wider block">Admin Identity</label>
+            <label htmlFor="admin-username" className="text-gray-400 uppercase tracking-wider block">Admin Identity</label>
             <div className="relative">
               <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
               <input
+                id="admin-username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="admin"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#06070a] border border-gray-800 text-white font-mono text-sm placeholder-gray-600 focus:outline-none focus:border-[#ff004f]"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#06070a] border border-gray-800 text-white font-mono text-sm placeholder-gray-600 focus:outline-none focus:border-[#ff004f] focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1117]"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-gray-400 uppercase tracking-wider block">Access Keyphrase</label>
+            <label htmlFor="admin-password" className="text-gray-400 uppercase tracking-wider block">Access Keyphrase</label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
               <input
+                id="admin-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#06070a] border border-gray-800 text-white font-mono text-sm placeholder-gray-600 focus:outline-none focus:border-[#ff004f]"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#06070a] border border-gray-800 text-white font-mono text-sm placeholder-gray-600 focus:outline-none focus:border-[#ff004f] focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1117]"
                 required
               />
             </div>
@@ -133,7 +135,7 @@ export const AdminIndex: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3.5 rounded-xl font-display font-black text-sm tracking-widest bg-[#ff004f] text-white hover:bg-[#ff2e7e] transition-all shadow-[0_0_20px_rgba(255,0,79,0.4)] flex items-center justify-center gap-2 mt-2 cursor-pointer"
+            className="w-full py-3.5 rounded-xl font-display font-black text-sm tracking-widest bg-[#ff004f] text-white hover:bg-[#ff2e7e] transition-all shadow-[0_0_20px_rgba(255,0,79,0.4)] flex items-center justify-center gap-2 mt-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1117]"
           >
             {isSubmitting ? 'AUTHENTICATING...' : (
               <>

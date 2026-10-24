@@ -84,6 +84,7 @@ export const AdminScores: React.FC = () => {
 
       {feedback && (
         <div
+          role={feedback.isError ? 'alert' : 'status'}
           className={`p-4 rounded-xl border flex items-center gap-2.5 font-mono text-xs sm:text-sm ${
             feedback.isError
               ? 'bg-red-950/30 border-red-800 text-red-400'
@@ -97,11 +98,12 @@ export const AdminScores: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-[#12151c] border border-gray-800 space-y-6 shadow-2xl font-mono text-xs">
         <div className="space-y-1.5">
-          <label className="text-gray-400 uppercase tracking-wider block">Target Squad</label>
+          <label htmlFor="target-team" className="text-gray-400 uppercase tracking-wider block">Target Squad</label>
           <select
+            id="target-team"
             value={selectedTeamId}
             onChange={(e) => setSelectedTeamId(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:border-[#00e676]"
+            className="w-full px-4 py-3 rounded-xl bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:outline-none focus:border-[#00e676] focus-visible:ring-2 focus-visible:ring-[#00e676]"
           >
             {teams.map((t) => (
               <option key={t.id} value={t.id}>
@@ -121,30 +123,32 @@ export const AdminScores: React.FC = () => {
         )}
 
         <div className="space-y-1.5">
-          <label className="text-gray-400 uppercase tracking-wider block">
+          <label htmlFor="points-delta" className="text-gray-400 uppercase tracking-wider block">
             Points Delta (Positive for bonus, Negative for penalty)
           </label>
           <input
             type="number"
+            id="points-delta"
             value={pointsDelta}
             onChange={(e) => setPointsDelta(Number(e.target.value))}
             min={-1000}
             max={1000}
-            className="w-full px-4 py-3 rounded-xl bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:border-[#00e676]"
+            className="w-full px-4 py-3 rounded-xl bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:outline-none focus:border-[#00e676] focus-visible:ring-2 focus-visible:ring-[#00e676]"
             required
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-gray-400 uppercase tracking-wider block">
+          <label htmlFor="audit-reason" className="text-gray-400 uppercase tracking-wider block">
             Mandatory Audited Justification (Min 5 chars)
           </label>
           <textarea
             rows={3}
+            id="audit-reason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="e.g. Adjudicator compensation for verified hall audio equipment glitch during Round 1 question #3."
-            className="w-full px-4 py-3 rounded-xl bg-[#090b0f] border border-gray-800 text-white font-mono text-xs placeholder-gray-600 focus:border-[#00e676]"
+            className="w-full px-4 py-3 rounded-xl bg-[#090b0f] border border-gray-800 text-white font-mono text-xs placeholder-gray-600 focus:outline-none focus:border-[#00e676] focus-visible:ring-2 focus-visible:ring-[#00e676]"
             required
           />
         </div>
@@ -152,7 +156,7 @@ export const AdminScores: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting || !reason.trim() || reason.trim().length < 5}
-          className={`w-full py-3.5 rounded-xl font-display font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`w-full py-3.5 rounded-xl font-display font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00e676] ${
             isSubmitting || reason.trim().length < 5
               ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
               : 'bg-[#00e676] text-black hover:bg-[#00ff88] shadow-[0_0_20px_rgba(0,230,118,0.4)]'
