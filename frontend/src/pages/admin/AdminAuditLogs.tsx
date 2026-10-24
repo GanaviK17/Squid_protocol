@@ -50,7 +50,8 @@ export const AdminAuditLogs: React.FC = () => {
 
         <button
           onClick={fetchLogs}
-          className="p-2 rounded-lg bg-[#12151c] border border-gray-800 text-gray-400 hover:text-white transition-colors self-start sm:self-auto"
+          aria-label="Refresh audit logs"
+          className="p-2 rounded-lg bg-[#12151c] border border-gray-800 text-gray-400 hover:text-white transition-colors self-start sm:self-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00f0ff] cursor-pointer"
         >
           <RefreshCw className="w-4 h-4" />
         </button>

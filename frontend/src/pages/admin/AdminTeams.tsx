@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { apiRequest } from '../../services/api';
 import { Users, KeyRound, Edit2, CheckCircle2, ShieldCheck, X } from 'lucide-react';
 
@@ -22,6 +22,24 @@ export const AdminTeams: React.FC = () => {
   const [newMembers, setNewMembers] = useState<string>('');
   const [newPin, setNewPin] = useState<string>('');
   const [feedback, setFeedback] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (editingTeam) {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          handleCloseModal();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [editingTeam]);
+
+  const handleCloseModal = () => {
+    setEditingTeam(null);
+    triggerRef.current?.focus();
+  };
 
   const fetchTeams = async () => {
     try {
@@ -38,7 +56,8 @@ export const AdminTeams: React.FC = () => {
     fetchTeams();
   }, []);
 
-  const handleEditClick = (team: TeamItem) => {
+  const handleEditClick = (team: TeamItem, e?: React.MouseEvent) => {
+    triggerRef.current = (e?.currentTarget as HTMLElement) || (document.activeElement as HTMLElement);
     setEditingTeam(team);
     setNewName(team.name);
     setNewMembers(team.members);
@@ -93,14 +112,17 @@ export const AdminTeams: React.FC = () => {
       {/* Edit Modal */}
       {editingTeam && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-[#12151c] rounded-2xl border border-gray-700 p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl">
+          <div role="dialog" aria-modal="true" aria-labelledby="edit-team-dialog-title" className="bg-[#12151c] rounded-2xl border border-gray-700 p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl focus:outline-none">
             <div className="flex items-center justify-between border-b border-gray-800 pb-3">
-              <h3 className="font-display font-bold text-lg text-white">
+              <h3 id="edit-team-dialog-title" className="font-display font-bold text-lg text-white">
                 Edit {editingTeam.teamCode} Credentials
               </h3>
               <button
-                onClick={() => setEditingTeam(null)}
-                className="text-gray-400 hover:text-white"
+                type="button"
+                onClick={handleCloseModal}
+
+                aria-label="Close edit team dialog"
+                className="text-gray-400 hover:text-white p-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -108,49 +130,53 @@ export const AdminTeams: React.FC = () => {
 
             <form onSubmit={handleSaveTeam} className="space-y-4 font-mono text-xs">
               <div className="space-y-1">
-                <label className="text-gray-400 uppercase block">Display Name</label>
+                <label htmlFor="edit-team-name" className="text-gray-400 uppercase block">Display Name</label>
                 <input
                   type="text"
+                  id="edit-team-name"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:border-[#ff004f]"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:border-[#ff004f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f]"
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-gray-400 uppercase block">Operative Members</label>
+                <label htmlFor="edit-team-members" className="text-gray-400 uppercase block">Operative Members</label>
                 <input
                   type="text"
+                  id="edit-team-members"
                   value={newMembers}
                   onChange={(e) => setNewMembers(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:border-[#ff004f]"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:border-[#ff004f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f]"
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-gray-400 uppercase block">Reset PIN (Leave blank to keep current)</label>
+                <label htmlFor="edit-team-pin" className="text-gray-400 uppercase block">Reset PIN (Leave blank to keep current)</label>
                 <input
                   type="text"
+                  id="edit-team-pin"
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value)}
                   placeholder="e.g. PIN#9921"
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:border-[#ff004f]"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#090b0f] border border-gray-800 text-white font-mono text-sm focus:border-[#ff004f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f]"
                 />
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3">
                 <button
                   type="button"
-                  onClick={() => setEditingTeam(null)}
-                  className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700"
+                onClick={handleCloseModal}
+
+                  className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-[#ff004f] text-white hover:bg-[#ff2e7e] font-bold"
+                  className="px-5 py-2 rounded-lg bg-[#ff004f] text-white hover:bg-[#ff2e7e] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] cursor-pointer"
                 >
                   Save Changes
                 </button>
@@ -201,8 +227,9 @@ export const AdminTeams: React.FC = () => {
                   </td>
                   <td className="py-3 px-3 text-right">
                     <button
-                      onClick={() => handleEditClick(t)}
-                      className="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 flex items-center gap-1 ml-auto transition-colors"
+                      onClick={(e) => handleEditClick(t, e)}
+                      aria-label={`Edit ${t.teamCode} credentials`}
+                      className="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 flex items-center gap-1 ml-auto transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] cursor-pointer"
                     >
                       <Edit2 className="w-3 h-3" />
                       <span>Edit</span>

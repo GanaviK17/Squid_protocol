@@ -174,7 +174,7 @@ export const AdminDashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-5">
         <div>
           <span className="font-mono text-xs text-[#ff004f] uppercase tracking-widest flex items-center gap-1.5">
-            <Radio className="w-4 h-4 animate-pulse" />
+            <Radio className="w-4 h-4 animate-pulse motion-reduce:animate-none" />
             CENTRAL EVENT CONTROL DASHBOARD
           </span>
           <h1 className="font-display font-black text-3xl text-white uppercase tracking-tight mt-1">
@@ -234,7 +234,7 @@ export const AdminDashboard: React.FC = () => {
               <span
                 className={`px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider ${
                   isRunning
-                    ? 'bg-[#00e676]/20 text-[#00e676] border border-[#00e676]/40 animate-pulse'
+                    ? 'bg-[#00e676]/20 text-[#00e676] border border-[#00e676]/40 animate-pulse motion-reduce:animate-none'
                     : isPaused
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                     : activeRound?.status === 'ENDED'
@@ -484,15 +484,16 @@ export const AdminDashboard: React.FC = () => {
           {/* 1. RED LIGHT BUTTON */}
           <button
             onClick={() => handleSignalChange('RED')}
+            aria-pressed={stats.currentSignal === 'RED'}
             disabled={isActionLoading}
-            className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer ${
+            className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
               stats.currentSignal === 'RED'
                 ? 'bg-[#ff004f]/20 border-[#ff004f] shadow-[0_0_30px_rgba(255,0,79,0.5)] text-white ring-1 ring-[#ff004f]'
                 : 'bg-[#090b0f] border-gray-800 text-gray-400 hover:border-[#ff004f]/50 hover:text-white'
             } ${isActionLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
             <div className="w-14 h-14 rounded-full bg-[#ff004f]/20 border-2 border-[#ff004f] flex items-center justify-center">
-              <span className={`w-6 h-6 rounded-full bg-[#ff004f] ${stats.currentSignal === 'RED' ? 'animate-ping' : ''}`} />
+              <span className={`w-6 h-6 rounded-full bg-[#ff004f] ${stats.currentSignal === 'RED' ? 'animate-ping motion-reduce:animate-none' : ''}`} />
             </div>
             <div className="text-center space-y-1">
               <span className="font-display font-black text-2xl tracking-wider uppercase text-[#ff004f] block">
@@ -510,15 +511,16 @@ export const AdminDashboard: React.FC = () => {
           {/* 2. GREEN LIGHT BUTTON */}
           <button
             onClick={() => handleSignalChange('GREEN')}
+            aria-pressed={stats.currentSignal === 'GREEN'}
             disabled={isActionLoading}
-            className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer ${
+            className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
               stats.currentSignal === 'GREEN'
                 ? 'bg-[#00e676]/20 border-[#00e676] shadow-[0_0_30px_rgba(0,230,118,0.4)] text-white ring-1 ring-[#00e676]'
                 : 'bg-[#090b0f] border-gray-800 text-gray-400 hover:border-[#00e676]/50 hover:text-white'
             } ${isActionLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
             <div className="w-14 h-14 rounded-full bg-[#00e676]/20 border-2 border-[#00e676] flex items-center justify-center">
-              <span className={`w-6 h-6 rounded-full bg-[#00e676] ${stats.currentSignal === 'GREEN' ? 'animate-pulse' : ''}`} />
+              <span className={`w-6 h-6 rounded-full bg-[#00e676] ${stats.currentSignal === 'GREEN' ? 'animate-pulse motion-reduce:animate-none' : ''}`} />
             </div>
             <div className="text-center space-y-1">
               <span className="font-display font-black text-2xl tracking-wider uppercase text-[#00e676] block">
@@ -536,8 +538,9 @@ export const AdminDashboard: React.FC = () => {
           {/* 3. DOUBLE POINTS ON/OFF BUTTON */}
           <button
             onClick={handleDoublePointsToggle}
+            aria-pressed={Boolean(stats.doublePointsEnabled)}
             disabled={isActionLoading}
-            className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer ${
+            className={`p-6 rounded-2xl border flex flex-col items-center justify-between gap-4 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${
               stats.doublePointsEnabled
                 ? 'bg-[#ffd166]/15 border-[#ffd166] shadow-[0_0_30px_rgba(255,209,102,0.35)] text-white ring-1 ring-[#ffd166]'
                 : 'bg-[#090b0f] border-gray-800 text-gray-400 hover:border-[#ffd166]/50 hover:text-white'
@@ -548,7 +551,7 @@ export const AdminDashboard: React.FC = () => {
                 ? 'bg-[#ffd166]/20 border-[#ffd166] text-[#ffd166]'
                 : 'bg-gray-800 border-gray-700 text-gray-500'
             }`}>
-              <Zap className={`w-7 h-7 ${stats.doublePointsEnabled ? 'fill-[#ffd166] animate-bounce' : ''}`} />
+              <Zap className={`w-7 h-7 ${stats.doublePointsEnabled ? 'fill-[#ffd166] animate-bounce motion-reduce:animate-none' : ''}`} />
             </div>
             <div className="text-center space-y-1">
               <span className={`font-display font-black text-2xl tracking-wider uppercase block ${
@@ -631,7 +634,7 @@ export const AdminDashboard: React.FC = () => {
                       <span className="font-bold text-white mr-2">{t.teamCode}</span>
                       <span className="text-gray-300">{t.name}</span>
                       {t.finalBreachCompletedAt && (
-                        <Flame className="w-3.5 h-3.5 text-[#ff004f] inline-block ml-1.5 animate-pulse" />
+                        <Flame className="w-3.5 h-3.5 text-[#ff004f] inline-block ml-1.5 animate-pulse motion-reduce:animate-none" />
                       )}
                     </td>
                     <td className="py-2.5 px-3 text-center text-gray-300">{t.r1Score}</td>

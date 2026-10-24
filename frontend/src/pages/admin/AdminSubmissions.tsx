@@ -41,11 +41,13 @@ export const AdminSubmissions: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 font-mono text-xs">
-            <Filter className="w-3.5 h-3.5 text-gray-500" />
+            <Filter className="w-3.5 h-3.5 text-gray-500" aria-hidden="true" />
+            <label htmlFor="round-filter" className="sr-only">Filter submissions by protocol</label>
             <select
+              id="round-filter"
               value={roundFilter}
               onChange={(e) => setRoundFilter(e.target.value)}
-              className="px-3 py-1.5 rounded-lg bg-[#12151c] border border-gray-800 text-white font-mono text-xs focus:outline-none focus:border-[#ff004f]"
+              className="px-3 py-1.5 rounded-lg bg-[#12151c] border border-gray-800 text-white font-mono text-xs focus:outline-none focus:border-[#ff004f] focus-visible:ring-2 focus-visible:ring-[#ff004f]"
             >
               <option value="">All Protocols</option>
               <option value="1">Round 1 (Signals)</option>
@@ -56,7 +58,8 @@ export const AdminSubmissions: React.FC = () => {
 
           <button
             onClick={fetchSubmissions}
-            className="p-2 rounded-lg bg-[#12151c] border border-gray-800 text-gray-400 hover:text-white transition-colors"
+            aria-label="Refresh submissions"
+            className="p-2 rounded-lg bg-[#12151c] border border-gray-800 text-gray-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
           </button>

@@ -117,7 +117,8 @@ export const LeaderboardPage: React.FC = () => {
                 <button
                   onClick={fetchLeaderboard}
                   title="Refresh standings"
-                  className="p-2 rounded-lg bg-[#12151c] border border-gray-800 text-gray-400 hover:text-white hover:border-gray-700 transition-colors"
+                  aria-label="Refresh standings"
+                  className="p-2 rounded-lg bg-[#12151c] border border-gray-800 text-gray-400 hover:text-white hover:border-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd166] cursor-pointer"
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
@@ -182,7 +183,7 @@ export const LeaderboardPage: React.FC = () => {
                                 </span>
                                 {t.finalBreachCompletedAt && (
                                   <span title="Final Breach Completed!">
-                                    <Flame className="w-4 h-4 text-[#ff004f] animate-pulse" />
+                                    <Flame className="w-4 h-4 text-[#ff004f] animate-pulse motion-reduce:animate-none" />
                                   </span>
                                 )}
                               </div>
