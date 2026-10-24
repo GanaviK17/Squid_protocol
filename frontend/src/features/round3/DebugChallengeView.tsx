@@ -171,13 +171,12 @@ export const DebugChallengeView: React.FC<DebugChallengeViewProps> = ({
             INSPECT FIRMWARE CODE IN YOUR PREFERRED LANGUAGE:
           </span>
 
-          <div className="flex items-center gap-1" role="tablist" aria-label="Programming language selector">
+          <div className="flex items-center gap-1" role="group" aria-label="Programming language selector">
             {(['python', 'java', 'c'] as const).map((lang) => (
               <button
                 key={lang}
                 type="button"
-                role="tab"
-                aria-selected={activeLang === lang}
+                aria-pressed={activeLang === lang}
                 onClick={() => setActiveLang(lang)}
                 className={`px-3 py-1 rounded font-mono text-xs uppercase font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] ${
                   activeLang === lang

@@ -270,7 +270,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
           {/* Options */}
           <div
             className="space-y-3 pt-2"
-            role="radiogroup"
+            role="group"
             aria-label="Multiple choice answers"
           >
             {Array.isArray(currentQuestion.options) &&
@@ -281,8 +281,7 @@ export const Round1View: React.FC<Round1ViewProps> = ({
                   <button
                     key={opt.id}
                     type="button"
-                    role="radio"
-                    aria-checked={isSelected}
+                    aria-pressed={isSelected}
                     disabled={isSubmitting || isPaused || isEnded}
                     onClick={() => handleSelectOption(opt.id)}
                     className={`w-full text-left p-4 rounded-xl border font-mono text-sm transition-all flex items-start gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff004f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12151c] ${

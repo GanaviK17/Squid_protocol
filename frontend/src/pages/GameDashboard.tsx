@@ -11,7 +11,7 @@ import { BrokenLogicView } from '../features/round2/BrokenLogicView';
 import { Round3View } from '../features/round3/Round3View';
 import { CountdownTimer } from '../components/CountdownTimer';
 import { RoundControl, Question, SudokuData, BrokenLogicData } from '../types/game';
-import { Users, Lock, CheckCircle2, ShieldCheck, Flame, Radio, ArrowRight } from 'lucide-react';
+import { Users, Lock, CheckCircle2, ShieldCheck, Flame, Radio, ArrowRight, AlertTriangle } from 'lucide-react';
 
 export const GameDashboard: React.FC = () => {
   const { user, team, isLoading: authLoading, refreshMe } = useAuth();
@@ -298,6 +298,8 @@ export const GameDashboard: React.FC = () => {
       subtitle: 'Stage 1: Shape Sudoku • Stage 2: Broken Logic',
       status: round2Data.brokenLogic?.isCompleted
         ? 'COMPLETED'
+        : round2Data.round?.status === 'PAUSED'
+        ? 'PAUSED'
         : round2Data.isUnlocked
         ? 'ACTIVE'
         : 'LOCKED',
@@ -310,6 +312,8 @@ export const GameDashboard: React.FC = () => {
       subtitle: 'Physical QR Gate • Multi-Lang Debugging',
       status: round3Data.isCompleted
         ? 'COMPLETED'
+        : round3Data.round?.status === 'PAUSED'
+        ? 'PAUSED'
         : round3Data.isUnlocked
         ? 'ACTIVE'
         : 'LOCKED',
@@ -376,7 +380,8 @@ export const GameDashboard: React.FC = () => {
             {protocols.map((p) => {
               const isSelected = activeTab === p.id;
               const isCompleted = p.status === 'COMPLETED';
-              const isActive = p.status === 'ACTIVE' || p.status === 'PAUSED';
+              const isPaused = p.status === 'PAUSED';
+              const isActive = p.status === 'ACTIVE';
               const isLocked = p.status === 'LOCKED' || p.status === 'UPCOMING';
 
               return (
@@ -403,10 +408,10 @@ export const GameDashboard: React.FC = () => {
                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[10px] font-bold uppercase tracking-wider ${
                         isCompleted
                           ? 'bg-[#00e676]/20 border border-[#00e676]/40 text-[#00e676]'
+                          : isPaused
+                          ? 'bg-amber-950/60 border border-amber-500/50 text-amber-300'
                           : isActive
                           ? 'bg-cyan-950/60 border border-cyan-800/60 text-cyan-300'
-                          : p.status === 'PAUSED'
-                          ? 'bg-amber-950/60 border border-amber-500/50 text-amber-300'
                           : 'bg-gray-800/80 border border-gray-700/60 text-gray-400'
                       }`}
                     >
@@ -414,6 +419,11 @@ export const GameDashboard: React.FC = () => {
                         <>
                           <CheckCircle2 className="w-3 h-3 text-[#00e676]" aria-hidden="true" />
                           <span>SOLVED</span>
+                        </>
+                      ) : isPaused ? (
+                        <>
+                          <AlertTriangle className="w-3 h-3 text-amber-400" aria-hidden="true" />
+                          <span>PAUSED</span>
                         </>
                       ) : isActive ? (
                         <>

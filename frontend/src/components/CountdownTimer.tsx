@@ -6,6 +6,7 @@ interface CountdownTimerProps {
   remainingSeconds?: number | null;
   status?: 'UPCOMING' | 'ACTIVE' | 'PAUSED' | 'ENDED' | string;
   isPaused?: boolean;
+  announce?: boolean;
   onExpire?: () => void;
   className?: string;
 }
@@ -15,6 +16,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   remainingSeconds: initialRemainingSeconds,
   status = 'ACTIVE',
   isPaused = false,
+  announce = true,
   onExpire,
   className = '',
 }) => {
@@ -148,9 +150,11 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   return (
     <>
       {/* Separate visually-hidden polite region for threshold-only announcements */}
-      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {thresholdAnnouncement}
-      </div>
+      {announce && (
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {thresholdAnnouncement}
+        </div>
+      )}
 
       {isUpcoming && (
         <div

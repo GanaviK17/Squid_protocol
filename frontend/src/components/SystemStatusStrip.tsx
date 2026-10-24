@@ -1,7 +1,7 @@
 import React from 'react';
 import { SignalState } from '../types/game';
 import { CountdownTimer } from './CountdownTimer';
-import { Wifi, WifiOff, Zap, ShieldAlert, CheckCircle2, AlertTriangle, Radio } from 'lucide-react';
+import { Wifi, WifiOff, Zap, CheckCircle2, AlertTriangle, Radio } from 'lucide-react';
 
 export type SSEConnectionStatus = 'connected' | 'reconnecting' | 'disconnected';
 
@@ -61,11 +61,10 @@ export const SystemStatusStrip: React.FC<SystemStatusStripProps> = ({
           </span>
         </div>
 
-        {/* Center / Right Section: Signal + 2X + Timer + Link Health */}
+        {/* Center / Right Section: Signal + 2X + Silent Timer + Link Health */}
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-between lg:justify-end">
-          {/* Signal State Compact Pill */}
+          {/* Signal State Compact Pill (Display badge only; authoritative live announcer is SignalIndicator) */}
           <div
-            role="status"
             aria-label={`Server signal state: ${isGreen ? 'Green Light' : 'Red Light'}`}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono text-xs font-bold transition-all ${
               isGreen
@@ -84,7 +83,6 @@ export const SystemStatusStrip: React.FC<SystemStatusStripProps> = ({
           {/* Double Points Pill (when enabled) */}
           {doublePointsEnabled && (
             <div
-              role="status"
               aria-label="Double points multiplier active"
               className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#ffd166]/15 border border-[#ffd166]/40 text-[#ffd166] font-mono text-xs font-bold"
             >
@@ -93,12 +91,13 @@ export const SystemStatusStrip: React.FC<SystemStatusStripProps> = ({
             </div>
           )}
 
-          {/* Timer Component */}
+          {/* Authoritative Timer Component (announce={false} prevents duplicate screen-reader live announcements) */}
           <CountdownTimer
             endTime={timerEndTime}
             remainingSeconds={timerRemainingSeconds}
             status={timerStatus}
             isPaused={isPaused}
+            announce={false}
             onExpire={onTimerExpire}
             className="text-xs py-1"
           />
